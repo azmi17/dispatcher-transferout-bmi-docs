@@ -25,9 +25,9 @@ Dokumentasi ini disiapkan untuk kebutuhan QA / SIT, catatan deployment, dan refe
 
 | Document                                      | Description                                             |
 | --------------------------------------------- | ------------------------------------------------------- |
-| [QA Testing Guide](./qa-testing-guide.md)     | Panduan utama untuk QA/SIT testing                      |
-| [gRPC Testing Guide](./grpc-testing-guide.md) | Panduan testing gRPC menggunakan Postman atau Insomnia  |
-| [Release Notes](./release-notes.md)           | Catatan rilis `1.0.0 RC1`                               |
+| [QA Test Guide](./qa-testing-guide.md)     | Panduan utama untuk QA/SIT testing                         |
+| [gRPC Test Guide](./grpc-testing-guide.md) | Panduan testing gRPC menggunakan Postman atau Insomnia     |
+| [Release Notes](./release-notes.md)        | Catatan rilis `1.0.0 RC1`                                  |
 
 ## Supported Services
 
@@ -48,13 +48,13 @@ Secara umum alur dispatcher BMI Gateway adalah sebagai berikut:
 ```txt
 Switching Transfer Out
    |
-   | Mengirim request transaksi melalui gRPC
+   | Kirim request transaksi melalui gRPC
    v
 Dispatcher Transfer Out BMI
    |
    | Menerima dan memvalidasi request
    | Menyiapkan data transaksi, credential, token, dan signature
-   | Mengirim request ke Bank BMI / Mockoon
+   | Kirim request ke Bank BMI / Mockoon
    v
 Bank BMI API / Mockoon
    |
@@ -62,30 +62,16 @@ Bank BMI API / Mockoon
    v
 Dispatcher Transfer Out BMI
    |
-   | Menyesuaikan response Bank BMI ke standar internal dispatcher
+   | Menyesuaikan response Bank BMI ke standar internal dispatcher 
    | Mengembalikan response ke Switching Transfer Out
    v
-Switching Transfer Out
-```
-
-Ringkasnya:
-
-```txt
-Switching Transfer Out
-   ↓
-Dispatcher Transfer Out BMI
-   ↓
-Bank BMI API / Mockoon
-   ↓
-Dispatcher Transfer Out BMI
-   ↓
 Switching Transfer Out
 ```
 
 ## Important Notes
 
 * Untuk fase QA/SIT saat ini, request ke API Bank BMI masih menggunakan Mockoon karena akses sandbox Bank BMI belum tersedia.
-* Response code testing wajib mengacu ke list code resmi pada dokumen Bank BMI di file PDF halaman 72, bukan didapat dari sample response.
+* Response code testing wajib mengacu ke list code resmi pada **dokumen Bank BMI di file PDF halaman 72**, bukan didapat dari sample response.
 * Service ini sudah mendukung fitur gRPC Server Reflection, sehingga Postman dapat membaca daftar service dan method secara otomatis melalui opsi **Using Server Reflection** saat membuat request gRPC.
 * Credential sementara menggunakan dummy credential, silakan buat data dummy sesuai kebutuhan testing.
 * Untuk development/testing, decrypt data credential dari database dapat di-bypass melalui konfigurasi:

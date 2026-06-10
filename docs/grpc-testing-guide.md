@@ -156,6 +156,6 @@ Method yang perlu diuji:
 * Data credential yang digunakan masih dummy.
 * Response mock harus mengikuti kontrak payload dan list response code dari dokumen Bank BMI.
 * Jangan mengacu pada sample response untuk menentukan response code.
-* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan pada doktek BMI halaman 72.
+* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan **pada doktek BMI halaman 72**.
 
 [← Kembali ke Halaman Utama](./index.md)

@@ -33,7 +33,7 @@ Untuk fase QA saat ini, testing dilakukan menggunakan mock response via Mockoon 
 
 ### 2. Response Code Guideline
 
-* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan pada doktek BMI halaman 72.
+* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan pada **doktek BMI halaman 72**.
 * Jangan menjadikan Sample Response sebagai acuan utama untuk response code.
 * Sample Response hanya digunakan sebagai referensi bentuk payload.
 * Acuan mapping tetap menggunakan daftar response code resmi yang tersedia pada dokumen.
