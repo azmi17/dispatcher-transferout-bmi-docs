@@ -329,8 +329,13 @@ Notes:
 
 ## Document TRD Dispatcher
 
-1. Dokumen Informasi Umum Pengembangan Ekosistem Transfer Out => `https://docs.google.com/document/d/1SgQlTbUchIQ9tXQbfqPTbu9HViTJ8cJr9Awovsf2PHc/edit?pli=1&tab=t.0`
-2. Dokumen Teknis Dispatcher Transfer Out BMI => `https://docs.google.com/spreadsheets/d/1yCAXFupyeQrilxAQ4bWKzTZgTrx3DIoBkUxkX3ujZA4/edit?pli=1&gid=226230398#gid=226230398`
-3. Dokumen Parameter Mapping Value Dispatcher Ke BMI => `https://docs.google.com/document/d/1BskS6d51QggFCwaT7Hz7PTW9wL7sMIgRe_OjSmdw7_s/edit?tab=t.0#heading=h.lalas9egnfi2`
+1. [Dokumen Informasi Umum Pengembangan Ekosistem Transfer Out](https://docs.google.com/document/d/1SgQlTbUchIQ9tXQbfqPTbu9HViTJ8cJr9Awovsf2PHc/edit?pli=1&tab=t.0)  
+   Berisi informasi umum pengembangan ekosistem Transfer Out.
+
+2. [Dokumen Teknis Dispatcher Transfer Out BMI](https://docs.google.com/spreadsheets/d/1yCAXFupyeQrilxAQ4bWKzTZgTrx3DIoBkUxkX3ujZA4/edit?pli=1&gid=226230398#gid=226230398)  
+   Berisi detail teknis service Dispatcher Transfer Out BMI.
+
+3. [Dokumen Parameter Mapping Value Dispatcher Ke BMI](https://docs.google.com/document/d/1BskS6d51QggFCwaT7Hz7PTW9wL7sMIgRe_OjSmdw7_s/edit?tab=t.0#heading=h.lalas9egnfi2)  
+   Berisi mapping parameter antara Dispatcher dan Bank BMI.
 
 [← Kembali ke Halaman Utama](./index.md)
