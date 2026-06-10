@@ -2,7 +2,7 @@
 
 ## Overview
 
-Dispatcher Transfer Out BMI Service adalah service internal yang berfungsi sebagai middleware dispatcher antara sistem Switching Transfer Out dengan layanan Bank BMI.
+Dispatcher Transfer Out BMI Service adalah service internal yang berfungsi sebagai middleware dispatcher antara sistem Switching Transfer Out dengan layanan Bank Muamalat Indonesia (BMI).
 
 Service ini menerima request transaksi dari Switching Transfer Out melalui gRPC, meneruskan transaksi ke API Bank BMI melalui HTTP, lalu mengembalikan response dalam format standar internal dispatcher.
 
