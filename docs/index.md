@@ -4,96 +4,91 @@
 
 Dispatcher Transfer Out BMI Service adalah service internal yang berfungsi sebagai middleware dispatcher antara sistem Switching Transfer Out dengan layanan Bank BMI.
 
-Service ini menerima request transaksi dari Switching Transfer Out melalui gRPC, melakukan validasi request dan metadata, menerjemahkan request ke format internal usecase, meneruskan transaksi ke API Bank BMI melalui HTTP, lalu mengembalikan response dalam format standar internal dispatcher.
+Service ini menerima request transaksi dari Switching Transfer Out melalui gRPC, meneruskan transaksi ke API Bank BMI melalui HTTP, lalu mengembalikan response dalam format standar internal dispatcher.
 
-Dokumentasi ini disiapkan untuk kebutuhan QA/UAT, deployment note, dan referensi internal developer.
+Dokumentasi ini disiapkan untuk kebutuhan QA / SIT, catatan deployment, dan referensi internal ITSD.
 
 ## Release Information
 
-| Item | Value |
-|---|---|
-| App Name | Dispatcher Transfer Out BMI |
-| Version | 1.0.0 RC1 |
-| Release Type | Release Candidate |
-| Status | READY TO TEST |
-| Target | QA/UAT |
-| Protocol | gRPC |
-| Partner API | Bank BMI |
-| Current Partner Mode | Mockoon |
-| Sandbox Status | Bank BMI sandbox access belum tersedia |
+| Item                 | Value                                  |
+| -------------------- | -------------------------------------- |
+| App Name             | Dispatcher Transfer Out BMI            |
+| Version              | 1.0.0 RC1                              |
+| Status               | READY TO TEST                          |
+| Target               | QA/SIT                                 |
+| Protocol             | gRPC                                   |
+| Partner API          | Bank BMI                               |
+| Current Partner Mode | Mockoon                                |
+| Sandbox Status       | Bank BMI sandbox access belum tersedia |
 
 ## Documentation Index
 
-| Document | Description |
-|---|---|
-| [QA Testing Guide](./qa-testing-guide.md) | Panduan utama untuk QA/UAT testing. |
-| [gRPC Testing Guide](./grpc-testing-guide.md) | Panduan testing gRPC menggunakan Postman, Insomnia, atau grpcurl. |
-| [Release Notes](./release-notes.md) | Catatan rilis `1.0.0 RC1`. |
+| Document                                      | Description                                             |
+| --------------------------------------------- | ------------------------------------------------------- |
+| [QA Testing Guide](./qa-testing-guide.md)     | Panduan utama untuk QA/SIT testing                      |
+| [gRPC Testing Guide](./grpc-testing-guide.md) | Panduan testing gRPC menggunakan Postman atau Insomnia  |
+| [Release Notes](./release-notes.md)           | Catatan rilis `1.0.0 RC1`                               |
 
 ## Supported Services
 
-| Service | gRPC Method | Description |
-|---|---|---|
-| Balance Inquiry | `GetBalanceInquiry` | Mengecek informasi saldo rekening IKM. |
-| Account Inquiry | `GetAccountInquiry` | Mengecek informasi rekening tujuan internal maupun external bank. |
-| Transfer | `DoTransfer` | Memproses transaksi transfer sesama / antar Bank. |
-| Transfer SKNBI | `DoTransferSknbi` | Memproses transaksi transfer SKNBI. |
-| Transfer RTGS | `DoTransferRtgs` | Memproses transaksi transfer RTGS. |
-| Transaction Status | `GetTransactionStatus` | Mengecek status transaksi berdasarkan referensi transaksi. |
-| Bank Statement | `GetBankStatement` | Mengambil histori transaksi rekening mitra. |
+| Service            | gRPC Method            | Description                                                       |
+| ------------------ | ---------------------- | ----------------------------------------------------------------- |
+| Balance Inquiry    | `GetBalanceInquiry`    | Mengecek informasi saldo rekening IKM                             |
+| Account Inquiry    | `GetAccountInquiry`    | Mengecek informasi rekening tujuan internal maupun external bank  |
+| Transfer           | `DoTransfer`           | Memproses transaksi transfer sesama / antar Bank                  |
+| Transfer SKNBI     | `DoTransferSknbi`      | Memproses transaksi transfer SKNBI                                |
+| Transfer RTGS      | `DoTransferRtgs`       | Memproses transaksi transfer RTGS                                 |
+| Transaction Status | `GetTransactionStatus` | Mengecek status transaksi berdasarkan referensi transaksi         |
+| Bank Statement     | `GetBankStatement`     | Mengambil histori transaksi rekening mitra                        |
 
-## High Level Flow
+## Dispatcer Transfer Out BMI Flow
+
+Secara umum alur dispatcher BMI Gateway adalah sebagai berikut:
 
 ```txt
 Switching Transfer Out
    |
-   | gRPC Request
+   | Mengirim request transaksi melalui gRPC
    v
-Dispatcher gRPC Handler
+Dispatcher Transfer Out BMI
    |
-   | Validate Metadata
-   | Validate Request Body
-   | Map Protobuf Request to Internal Params
-   v
-Usecase Layer
-   |
-   | Build Bank BMI Request
-   | Resolve Credential
-   | Resolve Access Token from Redis
-   | Request New Access Token if Redis Token is Missing / Expired
-   | Resolve Signature
-   v
-HTTP Client / API Repository
-   |
-   | HTTP Request
+   | Menerima dan memvalidasi request
+   | Menyiapkan data transaksi, credential, token, dan signature
+   | Mengirim request ke Bank BMI / Mockoon
    v
 Bank BMI API / Mockoon
    |
-   | HTTP Response
+   | Mengembalikan response transaksi
    v
-API Repository
+Dispatcher Transfer Out BMI
    |
-   | Map Bank Response
-   v
-Usecase Layer
-   |
-   | Map Bank BMI Response Code to Dispatcher Internal Code
-   | Build Internal Result
-   v
-Dispatcher gRPC Handler
-   |
-   | Map Internal Result to Protobuf Response
+   | Menyesuaikan response Bank BMI ke standar internal dispatcher
+   | Mengembalikan response ke Switching Transfer Out
    v
 Switching Transfer Out
-````
+```
+
+Ringkasnya:
+
+```txt
+Switching Transfer Out
+   ↓
+Dispatcher Transfer Out BMI
+   ↓
+Bank BMI API / Mockoon
+   ↓
+Dispatcher Transfer Out BMI
+   ↓
+Switching Transfer Out
+```
 
 ## Important Notes
 
-* Untuk fase QA saat ini, outbound API Bank BMI masih menggunakan Mockoon karena akses sandbox Bank BMI belum tersedia.
-* Response code testing wajib mengacu ke list code resmi pada dokumen Bank BMI, bukan hanya sample response.
-* gRPC Server Reflection sudah diaktifkan untuk memudahkan testing menggunakan Postman atau grpcurl.
-* Credential sementara menggunakan dummy credential.
-* Untuk development/testing, decrypt credential dapat di-bypass melalui konfigurasi:
+* Untuk fase QA/SIT saat ini, request ke API Bank BMI masih menggunakan Mockoon karena akses sandbox Bank BMI belum tersedia.
+* Response code testing wajib mengacu ke list code resmi pada dokumen Bank BMI di file PDF halaman 72, bukan didapat dari sample response.
+* Service ini sudah mendukung fitur gRPC Server Reflection, sehingga Postman dapat membaca daftar service dan method secara otomatis melalui opsi **Using Server Reflection** saat membuat request gRPC.
+* Credential sementara menggunakan dummy credential, silakan buat data dummy sesuai kebutuhan testing.
+* Untuk development/testing, decrypt data credential dari database dapat di-bypass melalui konfigurasi:
 
 ```txt
 app.decrypt.credential.param = false
@@ -104,11 +99,3 @@ app.decrypt.credential.param = false
 ```txt
 app.devel_mode = true
 ```
-
-## Related Links
-
-| Resource          | URL                       |
-| ----------------- | ------------------------- |
-| Repository        | `<github-repo-url>`       |
-| TRD Dispatcher    | `<google-docs-url>`       |
-| Bank BMI Document | `<bank-bmi-document-url>` |

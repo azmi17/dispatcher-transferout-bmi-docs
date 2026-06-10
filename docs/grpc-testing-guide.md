@@ -1,23 +1,29 @@
+[← Kembali ke Halaman Utama](./index.md)
+
 # gRPC Testing Guide
 
 ## Overview
 
-Dispatcher Transfer Out BMI Service menerima request dari Switching Transfer Out melalui protokol gRPC.
+Dispatcher Transfer Out BMI Service menerima request dari Switching Transfer Out menggunakan protokol gRPC.
 
-Untuk kebutuhan QA/UAT, testing gRPC direkomendasikan menggunakan Postman karena lebih mudah digunakan untuk eksplorasi service, method, metadata, dan request body.
+Untuk kebutuhan QA / SIT, testing gRPC direkomendasikan menggunakan Postman karena lebih mudah digunakan untuk memilih service, memilih method, mengisi metadata / header, mengisi request body, dan melihat response.
 
-Tool alternatif yang dapat digunakan:
+Tool yang dapat digunakan:
 
-- Postman, preferably
-- Insomnia
+* Postman (Diutamakan)
+* Insomnia
 
 ## gRPC Server Reflection
 
-Service ini sudah mengaktifkan gRPC Server Reflection.
+Service ini sudah mengaktifkan fitur **gRPC Server Reflection**.
 
-Dengan Server Reflection, tools seperti Postman atau grpcurl dapat mendeteksi service dan method gRPC secara otomatis tanpa perlu import file `.proto` secara manual.
+Secara sederhana, Server Reflection adalah fitur yang membantu Postman membaca daftar service dan method gRPC yang tersedia pada server secara otomatis.
 
-Jika reflection tidak tersedia pada environment tertentu, QA tetap dapat melakukan testing dengan cara import manual file `.proto`.
+Dengan fitur ini, QA tidak perlu melakukan import file `.proto` secara manual selama koneksi ke server gRPC berhasil dan Server Reflection aktif.
+
+Pada Postman, gunakan opsi **Using Server Reflection** saat memilih method gRPC.
+
+Jika daftar service atau method tidak muncul otomatis, opsi alternatifnya adalah melakukan import manual file `.proto`.
 
 ## Postman gRPC Testing Flow
 
@@ -28,33 +34,35 @@ Pada Postman:
 ```txt
 New
 -> gRPC Request
-````
+```
 
 ### 2. Input gRPC Server Address
 
 Masukkan host dan port gRPC server.
 
-Contoh:
+Contoh local:
 
 ```txt
 localhost:50051
 ```
 
-atau:
+Contoh environment QA / SIT:
 
 ```txt
-<qa-server-ip>:<grpc-port>
+<server-devel-ip>:<grpc-port>
 ```
 
-### 3. Configure Connection Mode
+### 3. Select Method Using Server Reflection
 
-Jika server belum menggunakan TLS, gunakan mode plaintext/insecure.
+Pada bagian pemilihan method, pilih opsi:
 
-### 4. Load Service via Reflection
+```txt
+Using Server Reflection
+```
 
-Jika Server Reflection aktif, Postman akan membaca daftar service dan method secara otomatis.
+Postman akan mencoba membaca daftar service dan method yang tersedia dari server.
 
-Pilih service dan method yang akan diuji, misalnya:
+Jika berhasil, pilih method yang akan diuji, misalnya:
 
 ```txt
 GetBalanceInquiry
@@ -66,15 +74,26 @@ GetTransactionStatus
 GetBankStatement
 ```
 
-### 5. Fill Request Body
+Jika method tidak muncul, pastikan:
 
-Isi body request sesuai struktur protobuf masing-masing method.
+* alamat host dan port sudah benar
+* service gRPC sudah running
+* Server Reflection aktif pada environment tersebut
+* koneksi ke server tidak terblokir network/firewall
 
-Gunakan generated protobuf contract sebagai acuan field request.
+Jika tetap tidak muncul, QA dapat menggunakan opsi import manual file `.proto`.
 
-### 6. Fill Metadata
+### 4. Fill Request Body
 
-Setiap request wajib membawa metadata berikut:
+Isi request body sesuai kebutuhan test case pada masing-masing method.
+
+Gunakan contoh request yang sudah disediakan oleh tim development / dokumen kontrak sebagai acuan.
+
+Pastikan field mandatory sudah terisi sebelum request dijalankan.
+
+### 5. Fill Metadata / Header
+
+Setiap request wajib membawa metadata / header berikut:
 
 | Metadata Key    | Example Value               |
 | --------------- | --------------------------- |
@@ -86,25 +105,57 @@ Setiap request wajib membawa metadata berikut:
 
 Catatan:
 
-Walaupun dokumen bisnis menulis metadata dalam format uppercase seperti `X-IKM-ID`, pada gRPC Go key diproses sebagai lowercase.
+Walaupun pada dokumen kontrak metadata ditulis seperti `X-IKM-ID`, pada testing gRPC di Postman disarankan menggunakan lowercase seperti contoh di atas.
 
-Gunakan lowercase saat testing di Postman:
+### 6. Invoke Request
+
+Klik:
 
 ```txt
-x-ikm-id
-x-service-id
-x-external-id
-channel-id
-x-timestamp
+Invoke
 ```
 
-### 7. Invoke Request
+Setelah request dijalankan, periksa response yang diterima dari service.
 
-Klik Invoke.
+## Expected Result
 
-Expected:
+Secara umum, hasil testing yang diharapkan adalah sebagai berikut:
 
-* Jika request valid, response protobuf dikembalikan sebagai normal response.
-* Jika metadata tidak valid, service mengembalikan gRPC technical error.
-* Jika body/message tidak valid, service mengembalikan protobuf response normal dengan response code internal `BAD_REQUEST`.
-* Jika terjadi business error dari Bank BMI/mock, service tetap mengembalikan protobuf response normal.
+* Jika metadata / header dan body request valid, service akan mengembalikan response normal.
+* Jika metadata / header wajib tidak dikirim atau kosong, service akan mengembalikan gRPC error.
+* Jika body request tidak valid atau mandatory field kosong, service akan mengembalikan response normal dengan response code internal `BAD_REQUEST`.
+* Jika terjadi error dari Bank BMI / Mockoon, service tetap mengembalikan response normal sesuai mapping response code internal dispatcher.
+* Response code yang diterima oleh Switching / QA adalah response code internal dispatcher, bukan response code mentah dari Bank BMI.
+
+## Mandatory Metadata / Header Checklist
+
+Sebelum menjalankan request, pastikan metadata berikut sudah diisi:
+
+* [ ] `x-ikm-id`
+* [ ] `x-service-id`
+* [ ] `x-external-id`
+* [ ] `channel-id`
+* [ ] `x-timestamp`
+
+## Method Checklist
+
+Method yang perlu diuji:
+
+* [ ] `GetBalanceInquiry`
+* [ ] `GetAccountInquiry`
+* [ ] `DoTransfer`
+* [ ] `DoTransferSknbi`
+* [ ] `DoTransferRtgs`
+* [ ] `GetTransactionStatus`
+* [ ] `GetBankStatement`
+
+## Testing Notes
+
+* Untuk fase QA / SIT saat ini, request ke Bank BMI masih diarahkan ke Mockoon.
+* Akses sandbox Bank BMI belum tersedia.
+* Data credential yang digunakan masih dummy.
+* Response mock harus mengikuti kontrak payload dan list response code dari dokumen Bank BMI.
+* Jangan mengacu pada sample response untuk menentukan response code.
+* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan pada doktek BMI halaman 72.
+
+[← Kembali ke Halaman Utama](./index.md)

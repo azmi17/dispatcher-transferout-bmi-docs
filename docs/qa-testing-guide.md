@@ -1,17 +1,6 @@
+[← Kembali ke Halaman Utama](./index.md)
+
 # QA Testing Guide
-
-## App Information
-
-| Item | Value |
-|---|---|
-| App Name | Dispatcher Transfer Out BMI |
-| Version | 1.0.0 RC1 |
-| Date | 2026-06-10 |
-| Status | READY TO TEST |
-| Target | QA/UAT |
-| Protocol | gRPC |
-| Partner API | Bank BMI |
-| Current Partner Mode | Mockoon |
 
 ## Ready To Test
 
@@ -20,13 +9,15 @@ Dispatcher Transfer Out BMI Service sudah selesai diimplementasikan secara fungs
 Service ini berfungsi sebagai engine dispatcher antara Switching Transfer Out dan Bank BMI dengan flow:
 
 ```txt
-Switching Transfer Out
--> gRPC Dispatcher
--> Usecase
--> HTTP API Repository
--> Bank BMI API / Mockoon
--> Mapping Response Code
--> gRPC Response ke Switching Transfer Out
+Switching
+↓
+gRPC
+↓
+Dispatcher
+↓
+REST API
+↓
+Bank Muamalat Indonesia (BMI)
 ````
 
 Untuk fase QA saat ini, testing dilakukan menggunakan mock response via Mockoon karena akses sandbox dari Bank BMI belum diberikan.
@@ -42,7 +33,7 @@ Untuk fase QA saat ini, testing dilakukan menggunakan mock response via Mockoon 
 
 ### 2. Response Code Guideline
 
-* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan pada dokumen TRD/Bank BMI halaman terakhir.
+* Setiap HTTP Response Code dan response status code dari Bank BMI wajib mengacu ke List Code yang disediakan pada doktek BMI halaman 72.
 * Jangan menjadikan Sample Response sebagai acuan utama untuk response code.
 * Sample Response hanya digunakan sebagai referensi bentuk payload.
 * Acuan mapping tetap menggunakan daftar response code resmi yang tersedia pada dokumen.
@@ -53,21 +44,41 @@ Dispatcher menerima request melalui protokol gRPC.
 
 Tool testing yang dapat digunakan:
 
-* Postman, preferably
+* Postman (Diutamakan)
 * Insomnia
-* grpcurl
 
 ### 4. gRPC Server Reflection
 
-Engine ini sudah mengaktifkan gRPC Server Reflection.
+Service ini sudah mengaktifkan fitur **gRPC Server Reflection**.
 
-Dengan Server Reflection, tools seperti Postman atau grpcurl dapat mendeteksi service dan method gRPC secara otomatis tanpa perlu import file `.proto` secara manual.
+Secara sederhana, Server Reflection adalah fitur yang membantu tools seperti Postman untuk membaca daftar service dan method gRPC yang tersedia pada server secara otomatis.
 
-Opsi lain tetap bisa menggunakan import manual file `.proto` jika dibutuhkan.
+Dengan fitur ini, Tester / QA tidak perlu melakukan import file `.proto` secara manual saat melakukan testing, selama koneksi ke server gRPC berhasil dan reflection aktif.
 
-### 5. Mandatory Metadata gRPC
+Pada Postman, flow penggunaannya adalah sebagai berikut:
 
-Setiap request gRPC wajib membawa metadata berikut:
+1. Buat request baru dengan tipe **gRPC Request**.
+2. Masukkan alamat host dan port gRPC server.
+3. Pada bagian pemilihan method, pilih opsi **Using Server Reflection**.
+4. Postman akan mencoba membaca daftar service dan method yang tersedia dari server.
+5. Pilih method yang akan diuji, misalnya:
+
+   * `GetBalanceInquiry`
+   * `GetAccountInquiry`
+   * `DoTransfer`
+   * `DoTransferSknbi`
+   * `DoTransferRtgs`
+   * `GetTransactionStatus`
+   * `GetBankStatement`
+6. Isi metadata/header wajib.
+7. Isi request body sesuai kebutuhan test case.
+8. Jalankan request.
+
+Jika daftar service atau method tidak muncul otomatis, opsi alternatifnya adalah menggunakan import manual file `.proto`.
+
+### 5. Mandatory Metadata / Header gRPC
+
+Setiap request gRPC wajib membawa metadata / header berikut:
 
 | Metadata Key    | Required |
 | --------------- | -------- |
@@ -76,18 +87,6 @@ Setiap request gRPC wajib membawa metadata berikut:
 | `X-EXTERNAL-ID` | Yes      |
 | `CHANNEL-ID`    | Yes      |
 | `X-TIMESTAMP`   | Yes      |
-
-Catatan:
-
-Pada implementasi gRPC Go, metadata key akan dibaca dalam lowercase:
-
-| Original Key    | gRPC Go Key     |
-| --------------- | --------------- |
-| `X-IKM-ID`      | `x-ikm-id`      |
-| `X-SERVICE-ID`  | `x-service-id`  |
-| `X-EXTERNAL-ID` | `x-external-id` |
-| `CHANNEL-ID`    | `channel-id`    |
-| `X-TIMESTAMP`   | `x-timestamp`   |
 
 ### 6. Credential & Encryption Note
 
@@ -99,7 +98,7 @@ Untuk memudahkan testing selama development, proses decrypt credential dapat di-
 app.decrypt.credential.param = false
 ```
 
-Jika konfigurasi tersebut bernilai `false`, credential dummy dapat digunakan tanpa proses decrypt.
+Jika konfigurasi tersebut bernilai `false`, data dummy dapat digunakan tanpa proses decrypt dengan syarat value yang di inject ke database juga harus value asli tanpa encrypt.
 
 ### 7. Development Logging Mode
 
@@ -109,7 +108,7 @@ Jika konfigurasi berikut diset `true`:
 app.devel_mode = true
 ```
 
-Maka request dan response yang sebelumnya dimasking akan tampil lebih lengkap pada log.
+Maka data request dan data response yang sebelumnya dimasking / hide akan tampil lebih lengkap pada log.
 
 Mode ini hanya digunakan untuk kebutuhan development/testing.
 
@@ -204,7 +203,6 @@ Description:
 
 * Mengecek status transaksi berdasarkan reference transaksi.
 * Pending hanya dikembalikan jika status dari Bank BMI memang mengarah ke pending.
-* Timeout saat proses check status tidak otomatis dianggap sebagai pending transaksi original.
 
 ### D. Statement / History
 
@@ -234,7 +232,7 @@ Description:
 
 ## Testing Focus
 
-### A. Metadata Validation
+### A. Metadata / Header Validation
 
 Pastikan setiap request membawa metadata wajib:
 
@@ -246,32 +244,19 @@ Pastikan setiap request membawa metadata wajib:
 
 Expected:
 
-* Jika metadata valid, request diteruskan ke usecase.
+* Jika metadata valid, request akan diteruskan sebagai transaksi.
 * Jika metadata missing/kosong, service mengembalikan gRPC technical error.
 
-### B. Request Body Validation
+### B. Request Body / Message Validation
 
 Pastikan mandatory field pada body request terisi.
 
 Expected:
 
-* Jika body valid, request diteruskan ke usecase.
+* Jika body valid, request akan diteruskan sebagai transaksi.
 * Jika body invalid/kosong, service mengembalikan protobuf response normal dengan response code internal `BAD_REQUEST`.
 
-### C. Business Error Handling
-
-Pastikan business error tidak dikembalikan sebagai gRPC error.
-
-Expected:
-
-* Business error dikembalikan sebagai normal protobuf response.
-* Format return tetap:
-
-```go
-return response, nil
-```
-
-### D. Timeout Handling
+### C. Timeout Handling
 
 Timeout pada transaksi financial posting:
 
@@ -295,7 +280,7 @@ Expected:
 * Timeout tidak otomatis dikembalikan sebagai pending transaksi.
 * Response mengikuti mapping error internal yang sesuai.
 
-### E. Response Code Mapping
+### D. Response Code Mapping
 
 Pastikan response code dari mock Bank BMI dimapping ke response code internal dispatcher.
 
@@ -304,27 +289,20 @@ Expected:
 * Switching hanya menerima response code internal dispatcher.
 * Response code Bank BMI tidak dikembalikan mentah sebagai final response ke Switching.
 
-### F. Logging & Tracing
+### E. Logging & Tracing
 
 Pastikan setiap request memiliki log dengan correlation id.
 
-Expected log flow:
+Contoh expected log flow:
 
 ```txt
-RECEIVE gRPC request
-Metadata log
-SEND HTTP request to Bank BMI / Mockoon
-RECV HTTP response from Bank BMI / Mockoon
-RESPONSE TO CLIENT
+RECEIVE gRPC | id=1781098074656788600
+SEND HTTP request to Bank BMI / Mockoon | id=1781098074656788600
+RECV HTTP response from Bank BMI / Mockoon | id=1781098074656788600
+RESPONSE TO CLIENT | id=1781098074656788600
 ```
 
-Correlation id internal:
-
-```txt
-id_req
-```
-
-`id_req` harus konsisten dari inbound gRPC sampai outbound HTTP.
+`correlation id` harus konsisten dari RECEIVE gRPC sampai SEND HTTP Request Ke API Bank BMI.
 
 ## Configuration Notes
 
@@ -339,15 +317,15 @@ Notes:
 
 * `app.devel_mode = true` digunakan agar request/response log tampil lebih lengkap untuk kebutuhan QA/debugging.
 * `app.decrypt.credential.param = false` digunakan agar credential dummy dapat digunakan tanpa decrypt selama development/testing.
-* Untuk environment non-development, konfigurasi masking dan decrypt credential harus disesuaikan kembali mengikuti security policy.
+* Untuk environment non-development, konfigurasi masking dan decrypt credential harus disesuaikan kembali mengikuti security internal yang sudah disepakati pada dokumen TRD.
 
 ## Mock / Sandbox Notes
 
 * Saat ini Bank BMI belum memberikan akses sandbox.
-* Testing outbound Bank BMI sementara diarahkan ke Mockoon.
+* Testing request ke Bank BMI sementara diarahkan ke Mockoon.
 * Data credential masih dummy.
 * Response mock harus dibuat mengikuti kontrak payload dan list response code dari dokumen Bank BMI.
-* Response code testing tidak boleh hanya mengacu pada Sample Response.
+* Response code testing tidak boleh mengacu pada Sample Response.
 
 ## Document TRD Dispatcher
 
@@ -355,31 +333,4 @@ Notes:
 2. `<google-docs-url>`
 3. `<google-docs-url>`
 
-## Document Bank BMI
-
-1. `<bank-bmi-document-url>`
-
-Catatan:
-
-Gunakan List Code pada halaman terakhir dokumen Bank BMI sebagai acuan response code.
-
-## GitHub
-
-```txt
-<github-repo-url>
-```
-
-## Deployment Notes
-
-* Build service dilakukan manual sesuai mekanisme deployment saat ini.
-* Service siap dideploy ke environment QA/UAT.
-* Setelah deployment, QA dapat melakukan testing melalui Postman gRPC dengan Server Reflection atau import manual file proto jika diperlukan.
-
-## Release Status
-
-| Item         | Value             |
-| ------------ | ----------------- |
-| Status       | READY TO TEST     |
-| Target       | QA/UAT Validation |
-| Release Type | Release Candidate |
-| Version      | 1.0.0 RC1         |
+[← Kembali ke Halaman Utama](./index.md)
