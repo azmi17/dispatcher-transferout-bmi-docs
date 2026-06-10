@@ -71,7 +71,7 @@ Switching Transfer Out
 ## Important Notes
 
 * Untuk fase QA/SIT saat ini, request ke API Bank BMI masih menggunakan Mockoon karena akses sandbox Bank BMI belum tersedia.
-* Response code testing wajib mengacu ke list code resmi pada **dokumen Bank BMI di file PDF halaman 72**, bukan didapat dari sample response.
+* Response code testing wajib mengacu ke list code resmi pada **Dokumen API Bank BMI di file PDF halaman 72**, bukan didapat dari sample response.
 * Service ini sudah mendukung fitur gRPC Server Reflection, sehingga Postman dapat membaca daftar service dan method secara otomatis melalui opsi **Using Server Reflection** saat membuat request gRPC.
 * Credential sementara menggunakan dummy credential, silakan buat data dummy sesuai kebutuhan testing.
 * Untuk development/testing, decrypt data credential dari database dapat di-bypass melalui konfigurasi:
