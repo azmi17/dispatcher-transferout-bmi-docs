@@ -87,9 +87,11 @@ Jika tetap tidak muncul, QA dapat menggunakan opsi import manual file `.proto`.
 
 Isi request body sesuai kebutuhan test case pada masing-masing method.
 
-Gunakan contoh request yang sudah disediakan oleh tim development / dokumen kontrak sebagai acuan.
+Gunakan contoh request yang sudah disediakan pada dokumen teknis engine Dispatcher Transfer Out BMI.
 
-Pastikan field mandatory sudah terisi sebelum request dijalankan.
+Atau dapat menggunakan fitur **Use Example Message** pada Postman untuk membuat contoh struktur request body secara otomatis berdasarkan method gRPC yang dipilih dan tinggal sesuaikan value request-nya.
+
+Pastikan seluruh field mandatory sudah terisi sebelum request dijalankan.
 
 ### 5. Fill Metadata / Header
 

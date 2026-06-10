@@ -71,8 +71,9 @@ Pada Postman, flow penggunaannya adalah sebagai berikut:
    * `GetTransactionStatus`
    * `GetBankStatement`
 6. Isi metadata/header wajib.
-7. Isi request body sesuai kebutuhan test case.
-8. Jalankan request.
+7. Isi request body sesuai kebutuhan test case. Atau dapat menggunakan fitur **Use Example Message** pada Postman untuk membuat contoh struktur request body secara otomatis berdasarkan method gRPC yang dipilih.
+8. Pastikan field mandatory sudah disesuaikan dengan kebutuhan test case.
+9. Jalankan request.
 
 Jika daftar service atau method tidak muncul otomatis, opsi alternatifnya adalah menggunakan import manual file `.proto`.
 
