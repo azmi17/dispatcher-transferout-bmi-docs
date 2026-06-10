@@ -4,9 +4,9 @@
 
 ## Ready To Test
 
-Dispatcher Transfer Out BMI Service sudah selesai diimplementasikan secara fungsional mulai dari level repository, usecase, service, sampai delivery gRPC.
+Dispatcher Transfer Out BMI Service sudah dapat dilakukan pengujian pada environment QA / SIT.
 
-Service ini berfungsi sebagai engine dispatcher antara Switching Transfer Out dan Bank BMI dengan flow:
+Service ini berfungsi sebagai penghubung antara Switching untuk layanan Transfer Out dengan Bank BMI untuk memproses layanan inquiry, transfer, pengecekan status transaksi, dan histori transaksi dengan flow:
 
 ```txt
 Switching
@@ -329,8 +329,8 @@ Notes:
 
 ## Document TRD Dispatcher
 
-1. `<google-docs-url>`
-2. `<google-docs-url>`
-3. `<google-docs-url>`
+1. Dokumen Informasi Umum Pengembangan Ekosistem Transfer Out => `https://docs.google.com/document/d/1SgQlTbUchIQ9tXQbfqPTbu9HViTJ8cJr9Awovsf2PHc/edit?pli=1&tab=t.0`
+2. Dokumen Teknis Dispatcher Transfer Out BMI => `https://docs.google.com/spreadsheets/d/1yCAXFupyeQrilxAQ4bWKzTZgTrx3DIoBkUxkX3ujZA4/edit?pli=1&gid=226230398#gid=226230398`
+3. Dokumen Parameter Mapping Value Dispatcher Ke BMI => `https://docs.google.com/document/d/1BskS6d51QggFCwaT7Hz7PTW9wL7sMIgRe_OjSmdw7_s/edit?tab=t.0#heading=h.lalas9egnfi2`
 
 [← Kembali ke Halaman Utama](./index.md)
