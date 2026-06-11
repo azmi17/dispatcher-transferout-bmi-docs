@@ -6,7 +6,7 @@
 
 ### Added
 
-1. **Integrasi Layanan Transfer Out dengan Mitra Bank Muamalat Indonesia**
+1. **Integrasi Layanan Transfer Out dengan Partner Bank Muamalat Indonesia**
 
    * Penambahan Endpoint & Handler untuk modul Balance Inquiry
    * Penambahan Endpoint & Handler untuk modul Account Inquiry
