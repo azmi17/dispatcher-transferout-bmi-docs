@@ -96,7 +96,7 @@ Data credential yang digunakan saat ini masih menggunakan dummy credential.
 Untuk memudahkan testing selama development, proses decrypt credential dapat di-bypass dengan konfigurasi:
 
 ```txt
-app.decrypt.credential.param = false
+app.decrypt_credential_param = false
 ```
 
 Jika konfigurasi tersebut bernilai `false`, data dummy dapat digunakan tanpa proses decrypt dengan syarat value yang di inject ke database juga harus value asli tanpa encrypt.
@@ -303,7 +303,7 @@ RECV HTTP response from Bank BMI / Mockoon | id=1781098074656788600
 RESPONSE TO CLIENT | id=1781098074656788600
 ```
 
-`correlation id` harus konsisten dari RECEIVE gRPC sampai SEND HTTP Request Ke API Bank BMI.
+`correlation id` harus konsisten dari RECEIVE gRPC sampai SEND HTTP, RECV HTTP dsan ke RESPONE TO CLIENT.
 
 ## Configuration Notes
 
@@ -311,13 +311,13 @@ Recommended development/testing config:
 
 ```txt
 app.devel_mode = true
-app.decrypt.credential.param = false
+app.decrypt_credential_param = false
 ```
 
 Notes:
 
 * `app.devel_mode = true` digunakan agar request/response log tampil lebih lengkap untuk kebutuhan QA/debugging.
-* `app.decrypt.credential.param = false` digunakan agar credential dummy dapat digunakan tanpa decrypt selama development/testing.
+* `app.decrypt_credential_param = false` digunakan agar credential dummy dapat digunakan tanpa decrypt selama development/testing.
 * Untuk environment non-development, konfigurasi masking dan decrypt credential harus disesuaikan kembali mengikuti security internal yang sudah disepakati pada dokumen TRD.
 
 ## Mock / Sandbox Notes

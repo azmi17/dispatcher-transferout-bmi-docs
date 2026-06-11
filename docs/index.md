@@ -77,7 +77,7 @@ Switching Transfer Out
 * Untuk development/testing, decrypt data credential dari database dapat di-bypass melalui konfigurasi:
 
 ```txt
-app.decrypt.credential.param = false
+app.decrypt_credential_param = false
 ```
 
 * Untuk melihat request/response log lebih lengkap selama testing, aktifkan:
