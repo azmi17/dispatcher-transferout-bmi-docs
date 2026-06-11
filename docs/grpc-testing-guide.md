@@ -127,7 +127,7 @@ Secara umum, hasil testing yang diharapkan adalah sebagai berikut:
 * Jika metadata / header wajib tidak dikirim atau kosong, service akan mengembalikan gRPC error.
 * Jika body request tidak valid atau mandatory field kosong, service akan mengembalikan response normal dengan response code internal `BAD_REQUEST`.
 * Jika terjadi error dari Bank BMI / Mockoon, service tetap mengembalikan response normal sesuai mapping response code internal dispatcher.
-* Response code yang diterima oleh Switching / QA adalah response code internal dispatcher, bukan response code mentah dari Bank BMI.
+* Response code yang diterima oleh Switching adalah response code internal dispatcher, bukan response code mentah dari Bank BMI.
 
 ## Mandatory Metadata / Header Checklist
 
