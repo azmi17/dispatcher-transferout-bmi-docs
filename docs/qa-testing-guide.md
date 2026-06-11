@@ -303,7 +303,7 @@ RECV HTTP response from Bank BMI / Mockoon | id=1781098074656788600
 RESPONSE TO CLIENT | id=1781098074656788600
 ```
 
-`correlation id` harus konsisten dari RECEIVE gRPC sampai SEND HTTP, RECV HTTP dsan ke RESPONE TO CLIENT.
+`correlation id` harus konsisten dari RECEIVE gRPC sampai SEND HTTP, RECV HTTP dan ke RESPONE TO CLIENT seperti bentuk diatas.
 
 ## Configuration Notes
 
